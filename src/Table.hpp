@@ -38,7 +38,10 @@ class Table{
 
         const double getPot() const;
 
-    
+        //loop principal da mesa, e esperando conexões;
+        //mutex para controle de acesso de região crítica
+        bool start(pthread_mutex_t mutex);
+
         bool addPlayer();
         bool removePlayer();
 

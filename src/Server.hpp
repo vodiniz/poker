@@ -13,12 +13,11 @@ class Server{
         int port;
         int portRange;
 
-        int numThreads;//max tables
         int *socketsThreadsIds;
         int maxTablePlayers;
 
     public:
-        Server(int port, int portRange, int maxTablePlayers = 6, int numThreads = 30);
+        Server(int port, int portRange, int maxTablePlayers = 6);
         virtual ~Server();
 
 
@@ -46,7 +45,7 @@ typedef struct str_thdata{
 } thdata;
 
 
-void *conexao(void *);
-
+void *conexao(void*);
+void *newPlayerHandle(void*);
 
 #endif

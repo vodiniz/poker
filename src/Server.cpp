@@ -19,6 +19,10 @@ using namespace std;
 //variável global para controlar acesso a região de memória
 pthread_mutex_t mutex;
 
+//variável global para o ID dos threads
+#define NUM_THREADS 30
+int socketsThreadsIds[NUM_THREADS];
+
 //wrapper para ponteiro de função
 // ESSA LÓGICA TÁ ERRADA. TODA CONEXÃO EU TO CRIANDO UMA MESA E UM PLAYER NESSE THREAD.
 //PRECISO ENTRAR NO THREAD E ADICIONAR O PLAYER QUE PRECISAR
@@ -29,17 +33,29 @@ void *conexao(void *param){
     
     Table* table = data->table;
     table->addPlayer();
-    table->start();
+    table->start(mutex);
+
+    pthread_exit(NULL);
+
+}
+
+void *newPlayerHandle(void* param){
+    
+    thdata *data = (thdata *) param; /* type cast to a pointer to thdata */
+    
+    cout << "Aguarde a rodada atual terminar, e você será adicionado a mesa." << endl;
+
+    pthread_mutex_lock(&mutex);
+    data->table->addPlayer();
+    pthread_mutex_unlock(&mutex);
+
+    //é assim que sai de uma thread? Tenho minhas dúvidas
+    pthread_exit(NULL);
 }
 
 
-Server::Server(int port, int portRange, int maxTablePlayers, int numThreads) :
-    port(port), portRange(portRange), maxTablePlayers(maxTablePlayers), numThreads(numThreads){
-
-    //inicializando o número de threads no meu server
-    socketsThreadsIds = new int[numThreads];
-
-}
+Server::Server(int port, int portRange, int maxTablePlayers) :
+    port(port), portRange(portRange), maxTablePlayers(maxTablePlayers){}
 
 Server::~Server(){
     delete socketsThreadsIds;
@@ -62,7 +78,7 @@ bool Server::start(){
     socklen_t addr_size;
 
     //array de identificação dos threads
-    pthread_t threads[this->numThreads];
+    pthread_t threads[NUM_THREADS];
 
     //atributos/caracteristicas do thread. Você pode definiar algumas scoisas como flags
     //tamanho do stack, endereço do stack, etc.
@@ -79,7 +95,10 @@ bool Server::start(){
 
 
     //struct para guardar o numero do thread e o socket.
-    thdata data[this->numThreads];
+    //isso aqui não tá legal, tenho 30 threads que é o máximo de "pessoas"
+    // mas cada mesa vai ter uma thread. 
+    // Mudar isso aqui vai ajudar
+    thdata data[NUM_THREADS];
 
     //inicializando o socket para receber as conexões
     welcomeSocket = socket(PF_INET, SOCK_STREAM, 0);
@@ -107,7 +126,7 @@ bool Server::start(){
     pthread_mutex_init(&mutex, NULL);
 
     // informando que o socket irá ouvir até NUM_THREADS conexões
-    if(listen(welcomeSocket,this->numThreads) == 0)
+    if(listen(welcomeSocket,NUM_THREADS) == 0)
         printf("Listening\n");
     else
         printf("Error\n");
@@ -116,7 +135,7 @@ bool Server::start(){
 
     // inicializando o vetor que conterá as referências para as threads. -1 indica que não existe thread associada.
     int i;
-    for (i = 0; i < this->numThreads; i++){
+    for (i = 0; i < NUM_THREADS; i++){
         socketsThreadsIds[i] = -1;
     }
 
@@ -124,7 +143,7 @@ bool Server::start(){
     i = 0;
     //loop para esperar as conexões. 
     //idealmente mudar para enquanto houver 1 cliente conectado seria interessante.
-    while (i < this->numThreads){
+    while (i < NUM_THREADS){
 
         printf("esperando conexao do jogador.... \n");
 
@@ -151,10 +170,27 @@ bool Server::start(){
         */
         if(this->totalPlayers() % this->maxTablePlayers == 0){
             createTable((void*) &data[i]);
+            pthread_create (&threads[i], &attr, conexao, (void *) &data[i]);
 
+        } else {
+
+            /*
+                itera sobre as mesas, até achar a primeira vazia
+                para salvar o ponteiro e adicionar o jogador nela.
+            */
+            for(TableIterator it = tablesBegin(); it < tablesEnd(); it++){
+                if((*it)->playersSize() < this->maxTablePlayers){
+                    data[i].table = (*it);
+                    break;
+                }
+            }
         }
 
-        pthread_create (&threads[i], &attr, conexao, (void *) &data[i]);
+        /*
+            Abre uma thread para adicionar um jogador na mesa.
+        */
+        pthread_create (&threads[i], &attr, newPlayerHandle, (void *) &data[i]);
+
 
         printf ("Jogador conectou.\n");
         i++;
@@ -165,7 +201,7 @@ bool Server::start(){
     printf("Abriu todas as threads. Esperando a thread terminar para fechar o servidor.\n");
 
     //Itera sobre as threads, e espera elas terminarem.
-    for (i = 0; i < this->numThreads; i++){
+    for (i = 0; i < NUM_THREADS; i++){
         //Mecanismo para esperar a thread terminar.
         pthread_join(threads[i], NULL);
     }
