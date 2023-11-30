@@ -9,8 +9,24 @@ using namespace std;
 class Server{
     protected:
         vector<Table> tables;
-        int MaxPlayers;
+        int maxPlayers;
+
         int port;
+        int portRange;
+
+        int numThreads = 30;
+        int *socketsThreadsIds;
+
+    public:
+        bool connect();
+        bool start();
+
 };
+
+typedef struct str_thdata{
+    int thread_no;
+    int sock;
+} thdata;
+
 
 #endif
