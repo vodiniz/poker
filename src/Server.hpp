@@ -9,23 +9,28 @@ using namespace std;
 class Server{
     protected:
         vector<Table> tables;
-        int maxPlayers;
 
         int port;
         int portRange;
 
-        int numThreads = 30;
+        int numThreads;//max tables
         int *socketsThreadsIds;
 
+        int maxTablePlayers;
+
     public:
-        bool connect();
+        Server(int port, int portRange, int maxTablePlayers = 6, int numThreads = 30);
+        virtual ~Server();
+        bool connect(void *param);
         bool start();
+        bool newTable();
 
 };
 
 typedef struct str_thdata{
     int thread_no;
     int sock;
+    static Server* server;
 } thdata;
 
 
