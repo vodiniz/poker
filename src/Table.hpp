@@ -11,17 +11,34 @@ using namespace std;
 class Table{
     protected:
         Deck deck;
-        vector<Card> cards;
+        vector<Card*> cards;
+        vector<Player*> players; // Usar um deck com ponteiros pode ser mais interessante para efeito de lista circular
         double pot;
-        vector<Player> players; // Usar um deck com ponteiros pode ser mais interessante para efeito de lista circular
-        Player* smallBinder; //um iterator para esse cara seria interessante para evitar esforço
+        Player* smallBinder; 
         double smallBindValue;
         int timer;
+        int thread_no;
+        int sock;
     
     public:
-        Table();
+        Table(int thread_no, int sock);
         virtual ~Table();
 
+        typedef vector<Card*>::iterator CardIterator;
+        CardIterator cardBegin();
+        CardIterator cardEnd();
+        const int cardSize() const;
+        Card* cardBack();
+
+        typedef vector<Player*>::iterator PlayerIterator;
+        PlayerIterator playersBegin();
+        PlayerIterator playersEnd();
+        const int playersSize() const;
+        Player* playersBack();
+
+        const double getPot() const;
+
+    
         bool addPlayer();
         bool removePlayer();
 

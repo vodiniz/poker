@@ -8,30 +8,45 @@ using namespace std;
 
 class Server{
     protected:
-        vector<Table> tables;
+        vector<Table*> tables;
 
         int port;
         int portRange;
 
         int numThreads;//max tables
         int *socketsThreadsIds;
-
         int maxTablePlayers;
 
     public:
         Server(int port, int portRange, int maxTablePlayers = 6, int numThreads = 30);
         virtual ~Server();
-        bool connect(void *param);
+
+
+        typedef vector<Table*>::iterator TableIterator;
+        TableIterator tablesBegin();
+        TableIterator tablesEnd();
+        const int tablesSize() const;
+        Table* tableBack();
+
+        static bool connect(void *param);
         bool start();
-        bool newTable();
+
+        Table* createTable(void *param);
+        bool newPlayer();
+
+        int totalPlayers();
+
 
 };
 
 typedef struct str_thdata{
     int thread_no;
     int sock;
-    static Server* server;
+    Table* table;
 } thdata;
+
+
+void *conexao(void *);
 
 
 #endif

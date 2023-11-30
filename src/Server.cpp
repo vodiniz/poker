@@ -20,12 +20,16 @@ using namespace std;
 pthread_mutex_t mutex;
 
 //wrapper para ponteiro de função
+// ESSA LÓGICA TÁ ERRADA. TODA CONEXÃO EU TO CRIANDO UMA MESA E UM PLAYER NESSE THREAD.
+//PRECISO ENTRAR NO THREAD E ADICIONAR O PLAYER QUE PRECISAR
+// ESSA PARTE TÁ UM POUCO COMPLICADA
 void *conexao(void *param){
     
-    thdata *data = (thdata *) param ;
-
-    Server* server = data->server;
-    server->connect(param);
+    thdata *data = (thdata *) param; /* type cast to a pointer to thdata */
+    
+    Table* table = data->table;
+    table->addPlayer();
+    table->start();
 }
 
 
@@ -35,25 +39,13 @@ Server::Server(int port, int portRange, int maxTablePlayers, int numThreads) :
     //inicializando o número de threads no meu server
     socketsThreadsIds = new int[numThreads];
 
-
-
 }
 
 Server::~Server(){
     delete socketsThreadsIds;
 }
 
-bool Server::connect(void *param){
 
-    //struct para armazenar numero do thread e socket
-    thdata *data;
-
-    data = (thdata *) param;  /* type cast to a pointer to thdata */
-
-    char buffer[1024], *result; // buffer vai ser o json de comunicação
-    int i;
-
-}
 
 bool Server::start(){
 
@@ -134,7 +126,7 @@ bool Server::start(){
     //idealmente mudar para enquanto houver 1 cliente conectado seria interessante.
     while (i < this->numThreads){
 
-        printf("esperando conexao do cliente.... \n");
+        printf("esperando conexao do jogador.... \n");
 
         //caso haja uma conexão nova, definimos o newSocket como o socket
         //para essa nova conexão.
@@ -150,29 +142,27 @@ bool Server::start(){
         data[i].thread_no = i;
         data[i].sock = newSocket;
 
-        //crianco um thread novo para essa conexão
+
+
 
         /*
-            AQUI É IMPORTANTE ALTERAR. ATULAMENTE PARA CADA CONEXÃO TEMOS UM THREAD NOVO.
-            ISSO NÃO É LEGAL, O IDEAL É UM THREAD PARA CADA MESA
-            E DENTRO DE CADA MESA ESPERAREMOS UMA RESPOSTA SEQUENCIAL DE CADA PLAYER.
-            NÃO TEM NECESSIDADE DE USAR UM THREAD PARA CADA PESSOA
-            
-            Aqui estou pegando a minha struct de dados e passando como parâmetro a função conexao
-            que vai executar num thread novo!
-
-            Porém tive um pouco de dificuldade de como implementar o ponteiro de função. Acho que assim funcionou
-            mas tem que testar depois.
+         Se o número total de jogadores for um múltiplo do número máximo de mesas
+         siginifica que todas as minhas mesas estão cheias, e eu tenho que criar um thread com uma mesa nova.
         */
+        if(this->totalPlayers() % this->maxTablePlayers == 0){
+            createTable((void*) &data[i]);
+
+        }
+
         pthread_create (&threads[i], &attr, conexao, (void *) &data[i]);
 
-        printf ("cliente conectou.\n");
+        printf ("Jogador conectou.\n");
         i++;
         pthread_mutex_unlock(&mutex);
     }
 
 
-     printf("Abriu todas as threads. Esperando a thread terminar para fechar o servidor.\n");
+    printf("Abriu todas as threads. Esperando a thread terminar para fechar o servidor.\n");
 
     //Itera sobre as threads, e espera elas terminarem.
     for (i = 0; i < this->numThreads; i++){
@@ -187,3 +177,34 @@ bool Server::start(){
 
 }
 
+
+const int Server::tablesSize() const{
+    return tables.size();
+}
+
+
+Table* Server::tableBack(){
+    return tables.back();
+}
+
+int Server::totalPlayers(){
+    int totalPlayers = 0;
+    for(TableIterator it = tablesBegin(); it < tablesEnd(); it++)
+        totalPlayers += (*it)->playersSize();
+
+    return totalPlayers;
+}
+
+    bool newPlayer();
+
+Table* Server::createTable(void* param){
+
+    thdata *data = (thdata *) param; /* type cast to a pointer to thdata */
+
+    Table *table = new Table(data->thread_no, data->sock);
+    data->table = table;
+    tables.push_back(table);
+
+    return table;
+
+}
