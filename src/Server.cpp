@@ -35,12 +35,23 @@ void *conexao(void *param){
     table->addPlayer();
     table->start(mutex);
 
+    //Sai do loop da mesa e antes de encerrar o thread irei marcar ele como inativo.
+    pthread_mutex_lock(&mutex);
+    //marcar as threads assim pode não ser o jeito mais legal de fazer.
+    socketsThreadsIds[data->thread_no] = -1; 
+    pthread_mutex_unlock(&mutex);
+
+    //é assim que sai de uma thread? Tenho minhas dúvidas
     pthread_exit(NULL);
 
 }
 
 void *newPlayerHandle(void* param){
-    
+    Server::newPlayer(param);
+}
+
+bool Server::newPlayer(void *param){
+
     thdata *data = (thdata *) param; /* type cast to a pointer to thdata */
     
     cout << "Aguarde a rodada atual terminar, e você será adicionado a mesa." << endl;
@@ -231,7 +242,6 @@ int Server::totalPlayers(){
     return totalPlayers;
 }
 
-    bool newPlayer();
 
 Table* Server::createTable(void* param){
 
@@ -244,3 +254,4 @@ Table* Server::createTable(void* param){
     return table;
 
 }
+

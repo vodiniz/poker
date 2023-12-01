@@ -13,7 +13,6 @@ class Server{
         int port;
         int portRange;
 
-        int *socketsThreadsIds;
         int maxTablePlayers;
 
     public:
@@ -31,7 +30,7 @@ class Server{
         bool start();
 
         Table* createTable(void *param);
-        bool newPlayer();
+        bool newPlayer(void *param);
 
         int totalPlayers();
 
