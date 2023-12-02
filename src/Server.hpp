@@ -30,7 +30,7 @@ class Server{
         bool start();
 
         Table* createTable(void *param);
-        bool newPlayer(void *param);
+        static bool newPlayer(void *param);
 
         int totalPlayers();
 

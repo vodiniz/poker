@@ -22,6 +22,8 @@ pthread_mutex_t mutex;
 //variável global para o ID dos threads
 #define NUM_THREADS 30
 int socketsThreadsIds[NUM_THREADS];
+int tableThreadsIds[NUM_THREADS]; // Utilizar no futuro para separar a lógica entre Socket e Threads. Ainda não está em uso
+
 
 //wrapper para ponteiro de função
 // ESSA LÓGICA TÁ ERRADA. TODA CONEXÃO EU TO CRIANDO UMA MESA E UM PLAYER NESSE THREAD.
@@ -90,6 +92,9 @@ bool Server::start(){
 
     //array de identificação dos threads
     pthread_t threads[NUM_THREADS];
+    //array de identificação dos threads para adicionar players
+    pthread_t addPlayerThreads[NUM_THREADS];
+
 
     //atributos/caracteristicas do thread. Você pode definiar algumas scoisas como flags
     //tamanho do stack, endereço do stack, etc.
@@ -150,7 +155,7 @@ bool Server::start(){
         socketsThreadsIds[i] = -1;
     }
 
-
+    int connectionsNumber = 0;
     i = 0;
     //loop para esperar as conexões. 
     //idealmente mudar para enquanto houver 1 cliente conectado seria interessante.
@@ -181,6 +186,7 @@ bool Server::start(){
         */
         if(this->totalPlayers() % this->maxTablePlayers == 0){
             createTable((void*) &data[i]);
+            i++; // Esse i armazena o o ID do thread criado. como eu crio uma mesa nova eu tenho um novo thread.
             pthread_create (&threads[i], &attr, conexao, (void *) &data[i]);
 
         } else {
@@ -199,10 +205,18 @@ bool Server::start(){
 
         /*
             Abre uma thread para adicionar um jogador na mesa.
+            Não pode ser o mesmo i porque eu utilizei ele ali 
+            em cima pra criar uma mesa. Caso seja o mesmo pode dar problema.
+
+            Vou ter que dividir a lógica entre threads e sockets. Atualmente está na mesma struct
+            e tá gerando esse problema.
+
+            Atualmente posso deixar assim, deve funcionar mas a lógica está péssima.
+            uma estrutura ou vetor dentro do server pode me ajudar a resolver isso.
+            pensar e desenvolver um pouco mais.
+
         */
-        pthread_create (&threads[i], &attr, newPlayerHandle, (void *) &data[i]);
-
-
+        pthread_create (&addPlayerThreads[i], &attr, newPlayerHandle, (void *) &data[i]);
         printf ("Jogador conectou.\n");
         i++;
         pthread_mutex_unlock(&mutex);
