@@ -50,6 +50,8 @@ void *newPlayerHandle(void* param){
 
     table->addPlayer(&player);
     Server::newPlayer(&player);
+
+    pthread_exit(NULL);
 }
 
 bool Server::newPlayer(Player *player){
@@ -173,6 +175,7 @@ bool Server::start(){
 
         if(!checkAvailableTable(possibleTable)){
             possibleTable = Server::createTable();
+            pthread_create (possibleTable->getThread(), &attr, tableStart, (void *) possibleTable);
         }
 
         tuple<int,Table*> tupleSocketTable(welcomeSocket, possibleTable);
@@ -181,10 +184,6 @@ bool Server::start(){
         pthread_t newPlayerThread;
         pthread_create (&newPlayerThread, &attr, newPlayerHandle, (void *) &tupleSocketTable);
 
-        pthread_join(newPlayerThread, NULL);
-
-
-        pthread_create (possibleTable->getThread(), &attr, tableStart, (void *) possibleTable);
 
     }
 
