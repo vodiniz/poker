@@ -3,17 +3,20 @@
 
 #include <vector>
 #include "Table.hpp"
+#include "ThreadData.hpp"
 
 using namespace std;
 
 class Server{
     protected:
-        vector<Table*> tables;
-
+        static vector<Table*> tables;
+        static vector<Player*> players;
         int port;
         int portRange;
-
+        char ip[10] = "127.0.0.1";
         int maxTablePlayers;
+        static int totalConnections;
+        bool firstConnection = false;
 
     public:
         Server(int port, int portRange, int maxTablePlayers = 6);
@@ -23,19 +26,21 @@ class Server{
         typedef vector<Table*>::iterator TableIterator;
         TableIterator tablesBegin();
         TableIterator tablesEnd();
-        const int tablesSize() const;
+        int tablesSize();
         Table* tableBack();
 
         static bool connect(void *param);
         bool start();
 
-        Table* createTable(void *param);
-        static bool newPlayer(void *param);
+        bool checkAvailableTable(Table *);
+
+        static Table* createTable();
+        static bool newPlayer(Player* player);
 
         int totalPlayers();
-
-
 };
+
+
 
 typedef struct str_thdata{
     int thread_no;
@@ -44,7 +49,7 @@ typedef struct str_thdata{
 } thdata;
 
 
-void *conexao(void*);
+void *tableStart(void*);
 void *newPlayerHandle(void*);
 
 #endif

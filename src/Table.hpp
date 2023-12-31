@@ -2,6 +2,7 @@
 #define TABLE_HPP_
 
 #include <vector>
+#include <pthread.h>
 
 #include "Player.hpp"
 #include "Deck.hpp"
@@ -10,6 +11,7 @@ using namespace std;
 
 class Table{
     protected:
+        pthread_t thread;
         Deck deck;
         vector<Card*> cards;
         vector<Player*> players; // Usar um deck com ponteiros pode ser mais interessante para efeito de lista circular
@@ -17,11 +19,9 @@ class Table{
         Player* smallBinder; 
         double smallBindValue;
         int timer;
-        int thread_no;
-        int sock;
     
     public:
-        Table(int thread_no, int sock);
+        Table();
         virtual ~Table();
 
         typedef vector<Card*>::iterator CardIterator;
@@ -42,7 +42,9 @@ class Table{
         //mutex para controle de acesso de região crítica
         bool start(pthread_mutex_t mutex);
 
-        bool addPlayer();
+        pthread_t* getThread();
+
+        bool addPlayer(Player *player);
         bool removePlayer();
 
         bool newRound();

@@ -4,21 +4,24 @@
 #include <string>
 #include <vector>
 
-#include <Card.hpp>
+#include "Card.hpp"
+#include "Table.hpp"
 #include "PlayerState.hpp"
 
 using namespace std;
 
 class Player{
     protected:
+        int sock;
         string name;
         int id;
         double money;
         vector<Card> hand;
         PlayerState state;
+        Table* currentTable;
 
     public:
-
+        Player();
         const string getName() const;
         const int getId() const;
 
