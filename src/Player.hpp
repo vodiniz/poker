@@ -7,6 +7,7 @@
 #include "Card.hpp"
 #include "Table.hpp"
 #include "PlayerState.hpp"
+#include "HandScore.hpp"
 
 using namespace std;
 
@@ -19,6 +20,8 @@ class Player{
         vector<Card> hand;
         PlayerState state;
         Table* currentTable;
+        HandScore handscore;
+
 
     public:
         Player();
@@ -39,6 +42,9 @@ class Player{
         bool check();
         bool bet();
         bool call();
+
+        bool calculateHandScore();
+        bool sortHand();
 
 };
 

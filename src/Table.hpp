@@ -36,6 +36,8 @@ class Table{
         const int playersSize() const;
         Player* playersBack();
 
+        Player* untie(Player *player1, Player *player2);
+        
         const double getPot() const;
 
         //loop principal da mesa, e esperando conexões;
@@ -56,6 +58,7 @@ class Table{
 
         bool showCards();
         bool showWinner();
+
 };
 
 #endif

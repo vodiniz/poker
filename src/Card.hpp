@@ -3,14 +3,15 @@
 
 #include <iostream>
 
-#include <SuitType.hpp>
+#include "CardValue.hpp"
+#include "SuitType.hpp"
 
 using namespace std;
 
 class Card{
 
     protected:
-        char value;
+        CardValue value;
         Suit suit;
 
     public:
@@ -18,7 +19,7 @@ class Card{
         Card(char, Suit);
         virtual ~Card();
 
-        const char getValue() const;
+        const CardValue getValue() const;
         const Suit getSuit() const;
 
         friend ostream& operator<<(ostream& os, const Card& card);
