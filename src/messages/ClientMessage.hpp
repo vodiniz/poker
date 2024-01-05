@@ -1,0 +1,1 @@
+//Classe que vai fazer a conversão de JSON para minha estrutura de comando.

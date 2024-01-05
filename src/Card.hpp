@@ -16,12 +16,13 @@ class Card{
 
     public:
     
-        Card(char, Suit);
+        Card(CardValue, Suit);
         virtual ~Card();
 
         const CardValue getValue() const;
         const Suit getSuit() const;
 
+        bool operator ==(const Card &card);
         friend ostream& operator<<(ostream& os, const Card& card);
 };
 

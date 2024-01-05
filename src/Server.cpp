@@ -17,8 +17,6 @@
 
 using namespace std;
 
-vector<ThreadData> threadData;
-
 
 //variável global para controlar acesso a região de memória
 pthread_mutex_t mutex;

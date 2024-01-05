@@ -9,17 +9,36 @@ using namespace std;
 class Deck{
 
     protected:
-        vector<Card> baseCards;
-        vector<Card> currentCards;
+        vector<Card*> deck;
+        vector<Card*> drawedCards;
 
     public:
         Deck();
         virtual ~Deck();
 
-        bool shuffle();
-        bool reset();
+        bool addDeckCard(Card*);
+        bool removeDeckCard(Card*);
 
-        bool removeTop();
+        bool addDrawedCard(Card*);
+        bool removeDrawedCard(Card*);
+
+        typedef vector<Card*>::iterator DeckIterator;
+        DeckIterator deckBegin();
+        DeckIterator deckEnd();
+        int deckSize();
+
+        typedef vector<Card*>::iterator DrawedCardsIterator;
+        DrawedCardsIterator drawedCardsBegin();
+        DrawedCardsIterator drawedCardsEnd();
+        int drawedCardsSize();
+
+
+
+        bool shuffle();
+        bool resetDeck();
+
+        bool drawCard();
+
 };
 
 #endif

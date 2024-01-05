@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "Card.hpp"
 #include "Table.hpp"
+#include "Card.hpp"
 #include "PlayerState.hpp"
 #include "HandScore.hpp"
 
@@ -17,9 +17,15 @@ class Player{
         string name;
         int id;
         double money;
-        vector<Card> hand;
+        vector<Card*> hand;
         PlayerState state;
-        Table* currentTable;
+        //BRUNO 
+        // DEPENDENCIA CIRCULAR SE COLOCAR TABLE AQUI
+        //EU ACHEI QUE SERIA BOM SABER EM QUAL MESA A PESSOA ESTÁ
+        // MAS DÁ PRA FAZER UMA BUSCA BEM FÁCIL PELO ID ENTÃO ACHO QUE NÃO TEM TANTO
+        //PROBLEMA NÃO DEIXAR ESSE PONTEIRO AQUI
+        
+        // Table *currentTable;
         HandScore handscore;
 
 
@@ -27,15 +33,19 @@ class Player{
         Player();
         const string getName() const;
         const int getId() const;
+        const int getSock() const;
 
         const double getMoney() const;
-        bool setMoney(); // Substituir por uma função que calcula os ganhos poderia ser interessante
+        bool setMoney(double value); // Substituir por uma função que calcula os ganhos poderia ser interessante
 
-        const vector<Card> getHand() const;
+        typedef vector<Card*>::iterator HandIterator;
+        HandIterator handBegin();
+        HandIterator handEnd();
+
         const PlayerState getState() const;
-        bool setState();
+        bool setState(PlayerState);
 
-        bool addHand(Card);
+        bool addHand(Card*);
         bool clearHand();
 
         bool fold();

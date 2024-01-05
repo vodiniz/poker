@@ -3,7 +3,6 @@
 
 #include <vector>
 #include "Table.hpp"
-#include "ThreadData.hpp"
 
 using namespace std;
 
@@ -39,14 +38,6 @@ class Server{
 
         int totalPlayers();
 };
-
-
-
-typedef struct str_thdata{
-    int thread_no;
-    int sock;
-    Table* table;
-} thdata;
 
 
 void *tableStart(void*);
