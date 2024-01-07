@@ -125,19 +125,15 @@ bool Deck::resetDeck(){
     return false;
 }
 
-bool Deck::drawCard(){
+Card* Deck::drawCard(){
     int deck_size = deckSize();
     int drawed_size = drawedCardsSize();
 
     if(deck_size == 0)
-        return false;
+        return NULL;
 
     Card* card = *(deckBegin());
     addDrawedCard(card);
     removeDeckCard(card);
 
-    if(deckSize() == deck_size + 1 && drawed_size + 1== drawedCardsSize())
-        return true;
-    
-    return false;
-}
+    return card;

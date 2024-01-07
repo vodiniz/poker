@@ -24,6 +24,38 @@ bool Card::operator==(const Card &card){
     return false;
 }
 
+bool Card::operator<(const Card &card){
+    
+    if(static_cast<int>(this->getSuit()) < static_cast<int>(card.getSuit()))
+        return true;
+    else if(static_cast<int>(this->getSuit()) > static_cast<int>(card.getSuit()))
+        return false;
+    else{
+        if(static_cast<int>(this->getValue()) < static_cast<int>(card.getValue()))
+            return true;
+        else
+            return false;
+    }
+
+    return false;
+}
+
+bool Card::operator>(const Card &card){
+    
+    if(static_cast<int>(this->getSuit()) > static_cast<int>(card.getSuit()))
+        return true;
+    else if(static_cast<int>(this->getSuit()) < static_cast<int>(card.getSuit()))
+        return false;
+    else{
+        if(static_cast<int>(this->getValue()) > static_cast<int>(card.getValue()))
+            return true;
+        else
+            return false;
+    }
+
+    return false;
+}
+
 ostream &operator<<(ostream &os, const Card &card){
 
     os << card.getValue() << "of" << card.getSuit();

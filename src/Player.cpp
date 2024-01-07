@@ -58,3 +58,11 @@ bool Player::clearHand(){
 
     return hand.empty();
 }
+
+bool Player::sortHand(){
+    return false;
+}
+
+bool Player::clearHand(){
+    hand.clear();
+}

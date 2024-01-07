@@ -41,6 +41,7 @@ class Player{
         typedef vector<Card*>::iterator HandIterator;
         HandIterator handBegin();
         HandIterator handEnd();
+        bool clearHand();
 
         const PlayerState getState() const;
         bool setState(PlayerState);

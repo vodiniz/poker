@@ -31,7 +31,7 @@ std::ostream& operator<<(std::ostream& os, const CardValue& cardValue) {
         case CardValue::EIGHT:
         case CardValue::NINE:
         case CardValue::TEN:
-            os << static_cast<char>(cardValue);
+            os << static_cast<int>(cardValue);
             break;
         case CardValue::JACK:
             os << "J";

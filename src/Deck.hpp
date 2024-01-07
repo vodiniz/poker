@@ -37,7 +37,7 @@ class Deck{
         bool shuffle();
         bool resetDeck();
 
-        bool drawCard();
+        Card* drawCard();
 
 };
 

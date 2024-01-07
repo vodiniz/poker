@@ -11,9 +11,9 @@ using namespace std;
 
 class Table{
     protected:
-        pthread_t thread;
+        pthread_t *thread;
         Deck deck;
-        vector<Card*> cards;
+        vector<Card*> tableCards;
         vector<Player*> players; // Usar um deck com ponteiros pode ser mais interessante para efeito de lista circular
         double pot;
         Player* smallBinder; 
@@ -24,11 +24,10 @@ class Table{
         Table();
         virtual ~Table();
 
-        typedef vector<Card*>::iterator CardIterator;
-        CardIterator cardBegin();
-        CardIterator cardEnd();
-        const int cardSize() const;
-        Card* cardBack();
+        typedef vector<Card*>::iterator TableCardsIterator;
+        TableCardsIterator tableCardsBegin();
+        TableCardsIterator tablecardsEnd();
+        const int tableCardsSize() const;
 
         typedef vector<Player*>::iterator PlayerIterator;
         PlayerIterator playersBegin();
@@ -47,7 +46,7 @@ class Table{
         pthread_t* getThread();
 
         bool addPlayer(Player *player);
-        bool removePlayer();
+        bool removePlayer(Player*);
 
         bool newRound();
         bool dealCards();

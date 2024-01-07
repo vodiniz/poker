@@ -23,6 +23,9 @@ class Card{
         const Suit getSuit() const;
 
         bool operator ==(const Card &card);
+        bool operator <(const Card& card);
+        bool operator >(const Card& card);
+
         friend ostream& operator<<(ostream& os, const Card& card);
 };
 
