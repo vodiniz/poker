@@ -51,6 +51,7 @@ class Table{
         bool newRound();
         bool dealCards();
 
+        bool preFlop();
         bool flop();
         bool turn();
         bool river();
