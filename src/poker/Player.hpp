@@ -22,7 +22,7 @@ class Player{
 
 
     public:
-        Player(string name);
+        Player(string name, int sock, int id);
         const string getName() const;
         const int getId() const;
         const int getSock() const;

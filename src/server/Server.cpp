@@ -15,8 +15,11 @@
 #include <arpa/inet.h>    // htons(), inet_addr()
 #include <sys/types.h>    // AF_INET, SOCK_STREAM
 
+
 vector<Table*> Server::tables;
 vector<Player*> Server::players;
+bool Server::firstConnection;
+int Server::totalConnections;
 
 using namespace std;
 
@@ -29,26 +32,29 @@ pthread_mutex_t mutex;
 
 //wrapper para ponteiro de função
 void *tableStart(void* param){
+    cout << "Criando uma mesa nova." << endl;
     Table* table = (Table*) param;
     table->start(&mutex);
     return NULL;
 }
 
 void *newPlayerHandle(void* param){
-
+    Server::firstConnection = true;
     tuple<int,Table*>* tupleSocketTable = (tuple<int,Table*>*) param;
 
     //extraindo os valores da tupla para usar posteriormente.
     int sock = get<0>(*tupleSocketTable);
     Table *table = get<1>(*tupleSocketTable);
-
+3
     char buffer[1024];
     recv(sock, buffer, sizeof(buffer), 0);
     
-    Player player(buffer);
+    Player player(buffer, sock, Server::totalConnections);
 
     table->addPlayer(&player);
     Server::newPlayer(&player);
+
+    cout << "O Player: " << player.getName() << "conectou" << endl;
 
     pthread_exit(NULL);
 }
@@ -56,6 +62,10 @@ void *newPlayerHandle(void* param){
 bool Server::newPlayer(Player *player){
     players.push_back(player);
     return true;
+}
+
+int Server::totalPlayers(){
+    return players.size();
 }
 
 int Server::tablesSize(){
@@ -153,8 +163,7 @@ bool Server::start(){
     //loop para esperar as conexões. 
     // caso eu já tenha 30 threads, ou 
 
-    int i = 0;
-    while (tablesSize() > 0 && !firstConnection){
+    while (tablesSize() > 0 || !firstConnection || totalPlayers() > 0){
 
         printf("esperando conexao do jogador.... \n");
 
@@ -203,6 +212,13 @@ Table* Server::createTable(){
 }
 
 
+Server::TableIterator Server::tablesBegin(){
+    return tables.begin();
+}
+Server::TableIterator Server::tablesEnd(){
+    return tables.end();
+}
+
 int main(void){
 
     Server *server = new Server(25555, 10, 30);
@@ -212,10 +228,3 @@ int main(void){
     return 0;
 }
 
-
-Server::TableIterator Server::tablesBegin(){
-    return tables.begin();
-}
-Server::TableIterator Server::tablesEnd(){
-    return tables.end();
-}

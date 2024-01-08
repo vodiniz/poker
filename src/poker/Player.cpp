@@ -1,7 +1,11 @@
 #include "Player.hpp"
 
-Player::Player(string name){
-    
+Player::Player(string name, int sock, int id){
+    this->sock = sock;
+    this->name = name;
+    this->id = id;
+    this->money = 1000;
+    this->state = PlayerState::Fold;
 }
 
 const string Player::getName() const{

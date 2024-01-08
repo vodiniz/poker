@@ -14,10 +14,10 @@ class Server{
         int portRange;
         char ip[10] = "127.0.0.1";
         int maxTablePlayers;
-        static int totalConnections;
-        bool firstConnection = false;
 
     public:
+        static int totalConnections;
+        static bool firstConnection;
         Server(int port, int portRange, int maxTablePlayers = 6);
         virtual ~Server();
 
