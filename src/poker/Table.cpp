@@ -9,7 +9,20 @@ const int Table::tableCardsSize() const{
     return tableCards.size();
 }
 
-Table::TableCardsIterator Table::tableCardsBegin(){
+Table::Table(pthread_mutex_t *mutex){
+    this->mutex = mutex;
+
+    this->pot = 0;
+    this->deck = Deck();
+    this->smallBindValue = SMALLBINDVALUE;
+    this->timer = 30;
+
+}
+
+Table::~Table(){}
+
+Table::TableCardsIterator Table::tableCardsBegin()
+{
     return tableCards.begin();
 }
 
@@ -36,7 +49,7 @@ Player* Table::playersBack(){
 
 
 pthread_t* Table::getThread(){
-    return thread;
+    return &thread;
 }
 
 bool Table::addPlayer(Player *player){
@@ -67,6 +80,7 @@ bool Table::newRound(){
     for(PlayerIterator playerIt = playersBegin(); playerIt < playersEnd(); playerIt++){
         (*playerIt)->clearHand();
     }
+    return true;
 }
 
 bool Table::dealCards(){
@@ -74,4 +88,9 @@ bool Table::dealCards(){
         for(int i = 0; i < 2; i++)
             (*playerIt)->addHand(deck.drawCard());
     }
+    return true;
+}
+
+bool Table::start(pthread_mutex_t *mutex){
+    return true;
 }

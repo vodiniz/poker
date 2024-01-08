@@ -1,14 +1,7 @@
 #include "Player.hpp"
 
-
-Player::Player(){
-    //BRUNO 
-    // AQUI DENTRO EU TENHO ALGUMAS OPÇÕES DE COMO FAZER ESSE CONSTRUTOR.
-    // PODERIAMOS RECEBER A STRING DO BUFFER DE COMUNICAÇÃO,
-    // PODERIAMOS RECEBER O JSON QUE JÁ FOI CONVERTIDO PELA FUNÇÃO DE ADICIONAR PLAYER NO SERVER
-    // OU SÓ OS PARÂMETROS JÁ TRATADOS. TODAS OPÇÕES SÃO VÁLIDAS E NÃO TENHO IDEIA DE QUAL A MELHOR
-    // QUAL SUA OPINIÃO?
-
+Player::Player(string name){
+    
 }
 
 const string Player::getName() const{
@@ -45,6 +38,7 @@ Player::HandIterator Player::handEnd(){
 
 bool Player::setState(PlayerState stateEnum){
     state = stateEnum;
+    return true;
 }
 
 bool Player::addHand(Card *card){
@@ -61,8 +55,4 @@ bool Player::clearHand(){
 
 bool Player::sortHand(){
     return false;
-}
-
-bool Player::clearHand(){
-    hand.clear();
 }

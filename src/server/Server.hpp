@@ -2,7 +2,7 @@
 #define SERVER_HPP_
 
 #include <vector>
-#include "Table.hpp"
+#include "../poker/Table.hpp"
 
 using namespace std;
 

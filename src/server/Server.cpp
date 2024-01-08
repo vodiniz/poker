@@ -15,6 +15,9 @@
 #include <arpa/inet.h>    // htons(), inet_addr()
 #include <sys/types.h>    // AF_INET, SOCK_STREAM
 
+vector<Table*> Server::tables;
+vector<Player*> Server::players;
+
 using namespace std;
 
 
@@ -27,7 +30,8 @@ pthread_mutex_t mutex;
 //wrapper para ponteiro de função
 void *tableStart(void* param){
     Table* table = (Table*) param;
-    table->start(mutex);
+    table->start(&mutex);
+    return NULL;
 }
 
 void *newPlayerHandle(void* param){
@@ -40,11 +44,8 @@ void *newPlayerHandle(void* param){
 
     char buffer[1024];
     recv(sock, buffer, sizeof(buffer), 0);
-
-    //BRUNO a mensagem recebida já virá padronizada. Usar uma biblitoeca json pode ser interessante.
-    // ou podemos passar como parâmetro a string toda.
-    //trocar esse param para as informações necessárias.
-    Player player;
+    
+    Player player(buffer);
 
     table->addPlayer(&player);
     Server::newPlayer(&player);
@@ -54,6 +55,7 @@ void *newPlayerHandle(void* param){
 
 bool Server::newPlayer(Player *player){
     players.push_back(player);
+    return true;
 }
 
 int Server::tablesSize(){
@@ -190,10 +192,30 @@ bool Server::start(){
    pthread_attr_destroy(&attr);
    pthread_mutex_destroy(&mutex);
 
+    return true;
+
 }
 
 Table* Server::createTable(){
-    Table *table = new Table(); 
+    Table *table = new Table(&mutex); 
     tables.push_back(table);
     return table;
+}
+
+
+int main(void){
+
+    Server *server = new Server(25555, 10, 30);
+    server->start();
+
+
+    return 0;
+}
+
+
+Server::TableIterator Server::tablesBegin(){
+    return tables.begin();
+}
+Server::TableIterator Server::tablesEnd(){
+    return tables.end();
 }

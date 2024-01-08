@@ -6,12 +6,15 @@
 
 #include "Player.hpp"
 #include "Deck.hpp"
+#define SMALLBINDVALUE 500
+#define TIMER 30
 
 using namespace std;
 
 class Table{
     protected:
-        pthread_t *thread;
+        pthread_t thread;
+        pthread_mutex_t *mutex;
         Deck deck;
         vector<Card*> tableCards;
         vector<Player*> players; // Usar um deck com ponteiros pode ser mais interessante para efeito de lista circular
@@ -20,8 +23,10 @@ class Table{
         double smallBindValue;
         int timer;
     
+
+
     public:
-        Table();
+        Table(pthread_mutex_t *mutex);
         virtual ~Table();
 
         typedef vector<Card*>::iterator TableCardsIterator;
@@ -41,7 +46,7 @@ class Table{
 
         //loop principal da mesa, e esperando conexões;
         //mutex para controle de acesso de região crítica
-        bool start(pthread_mutex_t mutex);
+        bool start(pthread_mutex_t *mutex);
 
         pthread_t* getThread();
 

@@ -126,10 +126,8 @@ bool Deck::resetDeck(){
 }
 
 Card* Deck::drawCard(){
-    int deck_size = deckSize();
-    int drawed_size = drawedCardsSize();
 
-    if(deck_size == 0)
+    if(deckSize() == 0)
         return NULL;
 
     Card* card = *(deckBegin());
@@ -137,3 +135,4 @@ Card* Deck::drawCard(){
     removeDeckCard(card);
 
     return card;
+}
