@@ -2,10 +2,12 @@
 #define PLAYER_STATE_HPP_
 
 enum class PlayerState{
-    Waiting = 0,
-    Fold = 1,
-    In = 2,
-    Quit = 3
+    WaitingBet = 0,
+    WaitingPlayers = 1,
+    Fold = 2,
+    In = 3,
+    Quit = 4
 };
+
 
 #endif

@@ -13,21 +13,31 @@ using namespace std;
 
 class Table{
     protected:
+        bool firstConnection;
         pthread_t thread;
         pthread_mutex_t *mutex;
         Deck deck;
         vector<Card*> tableCards;
         vector<Player*> players; // Usar um deck com ponteiros pode ser mais interessante para efeito de lista circular
         double pot;
+        double currentBet;
         Player* smallBinder; 
         double smallBindValue;
         int timer;
+        int round;
     
 
 
     public:
+        const bool getFirstConnection() const;
+        bool endRound();
+
         Table(pthread_mutex_t *mutex);
         virtual ~Table();
+
+        const double getCurrentBet() const;
+        bool setCurrentBet(double currentBet);
+        
 
         typedef vector<Card*>::iterator TableCardsIterator;
         TableCardsIterator tableCardsBegin();

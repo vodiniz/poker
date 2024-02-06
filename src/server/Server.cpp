@@ -39,22 +39,26 @@ void *tableStart(void* param){
 }
 
 void *newPlayerHandle(void* param){
+
+    
     Server::firstConnection = true;
     tuple<int,Table*>* tupleSocketTable = (tuple<int,Table*>*) param;
 
     //extraindo os valores da tupla para usar posteriormente.
     int sock = get<0>(*tupleSocketTable);
     Table *table = get<1>(*tupleSocketTable);
-3
+
     char buffer[1024];
     recv(sock, buffer, sizeof(buffer), 0);
+
+    cout << "1 recv do player: |" << buffer << "|" << endl;
     
     Player player(buffer, sock, Server::totalConnections);
 
     table->addPlayer(&player);
     Server::newPlayer(&player);
 
-    cout << "O Player: " << player.getName() << "conectou" << endl;
+    cout << "O Player: " << player.getName() << " conectou" << endl;
 
     pthread_exit(NULL);
 }
@@ -187,12 +191,18 @@ bool Server::start(){
             pthread_create (possibleTable->getThread(), &attr, tableStart, (void *) possibleTable);
         }
 
-        tuple<int,Table*> tupleSocketTable(welcomeSocket, possibleTable);
+       
+        
+        pthread_mutex_unlock(&mutex);
+
+
+        tuple<int,Table*> tupleSocketTable(newSocket, possibleTable);
 
         //criando thread para adicionar um player novo.
         pthread_t newPlayerThread;
         pthread_create (&newPlayerThread, &attr, newPlayerHandle, (void *) &tupleSocketTable);
-
+        
+        
 
     }
 
@@ -221,7 +231,7 @@ Server::TableIterator Server::tablesEnd(){
 
 int main(void){
 
-    Server *server = new Server(25555, 10, 30);
+    Server *server = new Server(25557, 10, 30);
     server->start();
 
 
