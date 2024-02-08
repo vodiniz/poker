@@ -40,7 +40,7 @@ class Server{
 };
 
 
+void *newPlayerHandle(void*, Server);
 void *tableStart(void*);
-void *newPlayerHandle(void*);
 
 #endif

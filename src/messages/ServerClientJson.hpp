@@ -9,14 +9,12 @@ using namespace std;
 
 
 struct ServerClientJson{
-    string command;
     int newMoneyValue;
     double currentTableBet;
     double playerMoneyOnTable;
     int playerState;
-    string tableCards;
 
-    JS_OBJ(command, newMoneyValue, currentTableBet, playerMoneyOnTable, playerState, tableCards);
+    JS_OBJ(newMoneyValue, currentTableBet, playerMoneyOnTable, playerState);
 };
 
 

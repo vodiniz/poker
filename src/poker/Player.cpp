@@ -1,6 +1,6 @@
 #include "Player.hpp"
 
-Player::Player() : sock(), name(""), id(0), money(1000), moneyOnTable(0), state(PlayerState::Fold){}
+Player::Player() : sock(), name(""), id(0), money(1000), moneyOnTable(0), state(PlayerState::WaitingBet){}
 
 Player::Player(string name, int sock, int id){
     this->sock = sock;
@@ -8,7 +8,7 @@ Player::Player(string name, int sock, int id){
     this->id = id;
     this->money = 1000;
     this->moneyOnTable = 0;
-    this->state = PlayerState::Fold;
+    this->state = PlayerState::WaitingBet;
 }
 
 bool Player::setName(string name){

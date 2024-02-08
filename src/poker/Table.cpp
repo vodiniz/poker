@@ -3,6 +3,9 @@
 #include <pthread.h>    /* POSIX Threads */ 
 #include <sys/types.h>    // AF_INET, SOCK_STREAM
 #include "../messages/ServerClientJson.hpp"
+#include "../messages/ClientServerJson.hpp"
+
+
 #include "unistd.h"
 
 
@@ -112,63 +115,134 @@ bool Table::dealCards(){
 }
 
 bool Table::endRound(){
-    int waitingBetPlayers = 0;
+
+    int InPlayers = 0;
     for(auto element : players){
-        if(element->getState() == PlayerState::WaitingBet)
-            waitingBetPlayers++;
+        if(element->getState() == PlayerState::In)
+            InPlayers++; 
     }
 
-    return waitingBetPlayers == 0;
+    cout << "inPlayers: " << InPlayers << " playerssize" << playersSize() << endl;
+    return InPlayers == playersSize();
 }
 
 bool Table::start(pthread_mutex_t *mutex){
 
-    char buffer[1024];
+    char buffer[2048];
 
+    
 
+    // serverJson.newMoneyValue = 10000;
+    // serverJson.currentTableBet = 1000;
+    // serverJson.playerMoneyOnTable = 500;
+    // serverJson.playerState = 0;
 
-    int contador = 0;
-
+    int contador = 1;
 
     while(true){
 
         if(playersSize() == 0 && getFirstConnection())
             break;
-        
+
         sleep(5);
-        
 
-
-        if(!this->endRound())
-            continue;
-
-        
-
+        cout << "-----------ROUND " << contador << " ---------------" << endl;  
 
         while(true){
 
-            if(!this->endRound())
-                continue;
+
+            if(this->endRound())
+                break;
+
+            int contador = 0;
 
             for(auto currentPlayer : players){
+
+                cout << "Vez do jogador: " << currentPlayer->getName() << " Com state: " << static_cast<int>(currentPlayer->getState()) << endl;
+
+                
 
                 currentPlayer->setState(PlayerState::WaitingBet);
 
                 ServerClientJson serverJson;
-                serverJson.newMoneyValue = 10000;
-                serverJson.currentTableBet = 1000;
-                serverJson.playerMoneyOnTable = 500;
-                serverJson.playerState = 0;
-                std::string pretty_json = JS::serializeStruct(serverJson);
-
-                send(currentPlayer->getSock(), pretty_json.c_str(), sizeof(pretty_json.c_str()), 0);
-                recv(currentPlayer->getSock(), buffer, sizeof(buffer), 0);
                 
-                cout << buffer << endl;
+                serverJson.newMoneyValue = currentPlayer->getMoney();
+                serverJson.playerMoneyOnTable = currentPlayer->getMoneyOnTable();
+                serverJson.playerState = static_cast<int>(currentPlayer->getState());
+                serverJson.currentTableBet = this->getCurrentBet();
+
+                std::string pretty_client_json = JS::serializeStruct(serverJson);
+
+                cout << "Enviando json para o client:\n" << pretty_client_json.c_str() << endl;
+
+                send(currentPlayer->getSock(), pretty_client_json.c_str(), sizeof(pretty_client_json.c_str()), 0);
+                recv(currentPlayer->getSock(), (void*)pretty_client_json.c_str(), sizeof((void*)pretty_client_json.c_str()), 0);
+                
+
+                cout<< "Buffer:\n" << (void*)pretty_client_json.c_str() << endl;
+                cout<< "Buffer2:\n" << pretty_client_json.c_str() << endl;
+
+                
+                //usando parser para preencher a struct
+                JS::ParseContext context(buffer);
+                ClientServerJson jsonTeste;
+                context.parseTo(jsonTeste);
+
+                cout << "JsonTeste:\n" << (string) JS::serializeStruct(jsonTeste) << endl;
+
+                
+
+                currentPlayer->setMoney(serverJson.newMoneyValue);
+                
+                //if(serverJson.currentTableBet > this->getCurrentBet())
+                //    this->setCurrentBet(serverJson.playerMoneyOnTable);
+
+                currentPlayer->setMoneyOnTable(serverJson.playerMoneyOnTable);
+                
+                std::string pretty_json = JS::serializeStruct(serverJson);
+                cout << "Recebi o serverJson: " << pretty_json << endl;
+                
+
+                switch (serverJson.playerState)
+                {
+                case 0:
+                    for(auto elem : players){
+                        cout << "TESTEEEEEEEEEEEEEEEEEEEEE" << endl;
+                        if(elem->getState() != PlayerState::Fold)
+                            elem->setState(PlayerState::WaitingPlayers);
+                    }
+                        currentPlayer->setState(PlayerState::In);
+                    break;
+                case 2:
+                    currentPlayer->setState(PlayerState::Fold);
+                    break;
+                
+                case 3:
+                    currentPlayer->setState(PlayerState::In);
+                    cout << "Switch case 3" << endl;
+                    break;
+                
+                case 4:
+                    auto it = players.begin() + contador;
+                    players.erase(it);
+                    break;
+                }
+
+                
+
+                
+                
+                cout << "terminou a vez do jogador " << currentPlayer->getName() << endl;
+
             }
+
         }
 
             
+            cout << "calcula pontuação" << endl;
+            cout << "------------Fim do round " << contador << " -------------" << endl;
+            contador++;
+
            
     }
 

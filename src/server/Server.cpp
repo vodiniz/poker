@@ -50,8 +50,6 @@ void *newPlayerHandle(void* param){
 
     char buffer[1024];
     recv(sock, buffer, sizeof(buffer), 0);
-
-    cout << "1 recv do player: |" << buffer << "|" << endl;
     
     Player player(buffer, sock, Server::totalConnections);
 
@@ -112,7 +110,7 @@ bool Server::start(){
     struct sockaddr_in serverAddr;
 
     //tamanho do endereço armazenado pelo Socket
-    socklen_t addr_size;
+    //socklen_t addr_size;
 
 
     //atributos/caracteristicas do thread. Você pode definiar algumas scoisas como flags
@@ -169,7 +167,7 @@ bool Server::start(){
 
     while (tablesSize() > 0 || !firstConnection || totalPlayers() > 0){
 
-        printf("esperando conexao do jogador.... \n");
+        //printf("esperando conexao do jogador.... \n");
 
 
         //caso haja uma conexão nova, definimos o newSocket como o socket
@@ -231,7 +229,7 @@ Server::TableIterator Server::tablesEnd(){
 
 int main(void){
 
-    Server *server = new Server(25557, 10, 30);
+    Server *server = new Server(25555, 10, 30);
     server->start();
 
 
